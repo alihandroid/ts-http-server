@@ -6,7 +6,7 @@ export async function handlerValidateChirp(req: Request, res: Response) {
     };
 
     type responseData = {
-        valid?: boolean;
+        cleanedBody?: string;
         error?: string;
     };
 
@@ -30,8 +30,11 @@ export async function handlerValidateChirp(req: Request, res: Response) {
         return;
     }
 
+    const badWords = ["kerfuffle", "sharbert", "fornax"];
+    const cleanedBody = parsedBody.body.split(" ").map(x => badWords.includes(x.toLowerCase()) ? "****" : x).join(" ");
+
     const resBody: responseData = {
-        valid: true
+        cleanedBody
     };
     res.contentType("application/json");
     res.status(200).send(JSON.stringify(resBody));
