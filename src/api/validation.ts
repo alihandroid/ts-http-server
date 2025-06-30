@@ -22,12 +22,7 @@ export async function handlerValidateChirp(req: Request, res: Response) {
     }
 
     if (parsedBody.body.length > 140) {
-        const resBody: responseData = {
-            error: "Chirp is too long"
-        };
-        res.contentType("application/json");
-        res.status(400).send(JSON.stringify(resBody));
-        return;
+        throw new Error("Chirp is too long");
     }
 
     const badWords = ["kerfuffle", "sharbert", "fornax"];
