@@ -6,10 +6,11 @@ import { handlerValidateChirp } from "./api/validation.js";
 
 const app = express();
 const PORT = 8080;
-
 app.use("/app", middlewareMetricsInc, express.static("./src/app"));
 
 app.use(middlewareLogResponses);
+
+app.use(express.json());
 
 app.get("/api/healthz", handlerReadiness);
 app.post("/api/validate_chirp", handlerValidateChirp);
