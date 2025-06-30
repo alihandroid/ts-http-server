@@ -9,3 +9,8 @@ export async function createChirp(chirp: NewChirp) {
         .returning();
     return result;
 }
+
+export async function getAllChirps() {
+    const result = await db.query.chirps.findMany({ orderBy: chirps.createdAt });
+    return result;
+}
