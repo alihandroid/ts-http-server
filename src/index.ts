@@ -3,7 +3,7 @@ import { handlerReadiness } from "./api/readiness.js";
 import { handlerMetrics } from "./api/metrics.js";
 import { handlerPostUsers } from "./api/users.js";
 import { handlerReset } from "./api/reset.js";
-import { handlerGetChirps, handlerPostChirps } from "./api/chirps.js";
+import { handlerGetChirp, handlerGetChirps, handlerPostChirps } from "./api/chirps.js";
 import { errorHandler, middlewareLogResponses, middlewareMetricsInc } from "./api/middleware.js";
 
 import { config } from "./config.js";
@@ -32,6 +32,9 @@ app.post("/api/chirps", (req, res, next) => {
 });
 app.get("/api/chirps", (req, res, next) => {
     Promise.resolve(handlerGetChirps(req, res)).catch(next);
+});
+app.get("/api/chirps/:chirpId", (req, res, next) => {
+    Promise.resolve(handlerGetChirp(req, res)).catch(next);
 });
 app.get("/admin/metrics", (req, res, next) => {
     Promise.resolve(handlerMetrics(req, res)).catch(next);
