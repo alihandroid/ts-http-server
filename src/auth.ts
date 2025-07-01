@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import bcrypt from "bcrypt";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import { Request } from "express";
@@ -62,4 +63,8 @@ export function getBearerToken(req: Request) {
     }
 
     return auth.slice(7);
+}
+
+export function makeRefreshToken() {
+    return crypto.randomBytes(32).toString('hex');
 }

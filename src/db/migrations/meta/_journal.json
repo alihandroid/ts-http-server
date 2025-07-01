@@ -22,6 +22,13 @@
       "when": 1751364470503,
       "tag": "0002_rich_drax",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1751375496423,
+      "tag": "0003_thankful_meltdown",
+      "breakpoints": true
     }
   ]
 }

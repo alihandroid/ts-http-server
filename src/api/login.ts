@@ -1,16 +1,14 @@
-import { Request, response, Response } from "express";
+import { Request, Response } from "express";
 import { BadRequestError, UnauthorizedError } from "../error.js";
 import { getUserByEmail } from "../db/queries/users.js";
-import { checkPasswordHash, makeJWT } from "../auth.js";
+import { checkPasswordHash, getBearerToken, makeJWT, makeRefreshToken } from "../auth.js";
 import { config } from "../config.js";
+import { createRefreshToken, getRefreshToken, revokeRefreshToken } from "../db/queries/refreshTokens.js";
+import { NewResfreshToken } from "../db/schema.js";
 
 export async function handlerLogin(req: Request, res: Response) {
     const email = req.body.email;
     const password = req.body.password;
-    let expiresInSeconds = req.body.expiresInSeconds ?? 1 * 60 * 60; // 1 hour by default
-    if (expiresInSeconds > 1 * 60 * 60) {
-        expiresInSeconds = 1 * 60 * 60; // max 1 hour
-    }
 
     if (!email) {
         throw new BadRequestError("Missing property: email");
@@ -32,7 +30,35 @@ export async function handlerLogin(req: Request, res: Response) {
 
     const { hashedPassword, ...response } = user;
 
-    const token = makeJWT(user.id, expiresInSeconds, config.jwtSecret);
+    const token = makeJWT(user.id, 1 * 60 * 60, config.jwtSecret);
+    const refreshToken = makeRefreshToken();
 
-    res.status(200).json({ ...response, token });
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 60);
+
+    const newResfreshToken: NewResfreshToken = { token: refreshToken, userId: user.id, expiresAt };
+
+    await createRefreshToken(newResfreshToken);
+
+    res.status(200).json({ ...response, token, refreshToken });
+}
+
+export async function handlerRefresh(req: Request, res: Response) {
+    const refTokenStr = getBearerToken(req);
+    const refreshToken = await getRefreshToken(refTokenStr);
+
+    if (!refreshToken) {
+        throw new UnauthorizedError("Refresh token does not exist");
+    }
+
+    const token = makeJWT(refreshToken.userId, 1 * 60 * 60, config.jwtSecret);
+
+    res.status(200).json({ token });
+}
+
+export async function handlerRevoke(req: Request, res: Response) {
+    const refTokenStr = getBearerToken(req);
+    await revokeRefreshToken(refTokenStr);
+
+    res.sendStatus(204);
 }

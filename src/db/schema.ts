@@ -1,5 +1,6 @@
 import { relations } from "drizzle-orm";
 import { pgTable, timestamp, varchar, uuid, text } from "drizzle-orm/pg-core";
+import test from "node:test";
 
 export const users = pgTable("users", {
     id: uuid("id").primaryKey().defaultRandom(),
@@ -37,3 +38,17 @@ export const chirpsRelations = relations(chirps, ({ one }) => ({
         }
     )
 }));
+
+export const refreshTokens = pgTable("refresh_tokens", {
+    token: varchar("token").primaryKey(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at")
+        .notNull()
+        .defaultNow()
+        .$onUpdate(() => new Date()),
+    userId: uuid("userId").references(() => users.id, { onDelete: "cascade" }).notNull(),
+    expiresAt: timestamp("expires_at").notNull(),
+    revokedAt: timestamp("revoked_at"),
+});
+
+export type NewResfreshToken = typeof refreshTokens.$inferInsert;

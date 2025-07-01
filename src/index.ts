@@ -4,7 +4,7 @@ import { handlerMetrics } from "./api/metrics.js";
 import { handlerPostUsers } from "./api/users.js";
 import { handlerReset } from "./api/reset.js";
 import { handlerGetChirp, handlerGetChirps, handlerPostChirps } from "./api/chirps.js";
-import { handlerLogin } from "./api/login.js";
+import { handlerLogin, handlerRefresh, handlerRevoke } from "./api/login.js";
 import { errorHandler, middlewareLogResponses, middlewareMetricsInc } from "./api/middleware.js";
 
 import { config } from "./config.js";
@@ -27,6 +27,12 @@ app.get("/api/healthz", (req, res, next) => {
 });
 app.post("/api/login", (req, res, next) => {
     Promise.resolve(handlerLogin(req, res)).catch(next);
+});
+app.post("/api/refresh", (req, res, next) => {
+    Promise.resolve(handlerRefresh(req, res)).catch(next);
+});
+app.post("/api/revoke", (req, res, next) => {
+    Promise.resolve(handlerRevoke(req, res)).catch(next);
 });
 app.post("/api/users", (req, res, next) => {
     Promise.resolve(handlerPostUsers(req, res)).catch(next);
