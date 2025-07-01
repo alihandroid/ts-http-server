@@ -15,6 +15,13 @@
       "when": 1751308823409,
       "tag": "0001_last_impossible_man",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1751364470503,
+      "tag": "0002_rich_drax",
+      "breakpoints": true
     }
   ]
 }
