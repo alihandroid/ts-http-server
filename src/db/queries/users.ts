@@ -19,3 +19,8 @@ export async function getUserByEmail(email: string) {
     const result = await db.query.users.findFirst({ where: eq(users.email, email) });
     return result;
 }
+
+export async function updateUser(userId: string, user: NewUser) {
+    const [result] = await db.update(users).set(user).where(eq(users.id, userId)).returning();
+    return result;
+}

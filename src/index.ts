@@ -1,7 +1,7 @@
 import express from "express";
 import { handlerReadiness } from "./api/readiness.js";
 import { handlerMetrics } from "./api/metrics.js";
-import { handlerPostUsers } from "./api/users.js";
+import { handlerPostUsers, handlerPutUsers } from "./api/users.js";
 import { handlerReset } from "./api/reset.js";
 import { handlerGetChirp, handlerGetChirps, handlerPostChirps } from "./api/chirps.js";
 import { handlerLogin, handlerRefresh, handlerRevoke } from "./api/login.js";
@@ -36,6 +36,9 @@ app.post("/api/revoke", (req, res, next) => {
 });
 app.post("/api/users", (req, res, next) => {
     Promise.resolve(handlerPostUsers(req, res)).catch(next);
+});
+app.put("/api/users", (req, res, next) => {
+    Promise.resolve(handlerPutUsers(req, res)).catch(next);
 });
 app.post("/api/chirps", (req, res, next) => {
     Promise.resolve(handlerPostChirps(req, res)).catch(next);

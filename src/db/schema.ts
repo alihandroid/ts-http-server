@@ -15,7 +15,6 @@ export const users = pgTable("users", {
 
 export type NewUser = typeof users.$inferInsert;
 
-
 export const chirps = pgTable("chirps", {
     id: uuid("id").primaryKey().defaultRandom(),
     createdAt: timestamp("created_at").notNull().defaultNow(),

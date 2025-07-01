@@ -55,11 +55,11 @@ export function getBearerToken(req: Request) {
     const auth = req.get("Authorization");
 
     if (!auth) {
-        throw new Error("Authorization does not exist");
+        throw new UnauthorizedError("Authorization does not exist");
     }
 
     if (!auth.startsWith("Bearer ")) {
-        throw new Error("Authorization is not a Bearer token");
+        throw new UnauthorizedError("Authorization is not a Bearer token");
     }
 
     return auth.slice(7);
