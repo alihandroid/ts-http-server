@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { BadRequestError, NotFoundError } from "../error.js";
+import { BadRequestError, ForbiddenError, NotFoundError } from "../error.js";
 import { NewChirp } from "../db/schema.js";
-import { createChirp, getAllChirps, getChirpById } from "../db/queries/chirps.js";
+import { createChirp, deleteChirpById, getAllChirps, getChirpById } from "../db/queries/chirps.js";
 import { getBearerToken, validateJWT } from "../auth.js";
 import { config } from "../config.js";
 
@@ -50,4 +50,23 @@ export async function handlerGetChirp(req: Request, res: Response) {
     }
 
     res.status(200).json(result);
+}
+
+export async function handlerDeleteChirp(req: Request, res: Response) {
+    const accessTokenStr = getBearerToken(req);
+    const userId = validateJWT(accessTokenStr, config.jwtSecret);
+
+    const chirp = await getChirpById(req.params.chirpId);
+
+    if (!chirp) {
+        throw new NotFoundError("Chirp not found");
+    }
+
+    if (chirp.userId != userId) {
+        throw new ForbiddenError("Chirps can only be deleted by their posters");
+    }
+
+    await deleteChirpById(chirp.id);
+
+    res.sendStatus(204);
 }
