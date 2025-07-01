@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt, { type JwtPayload } from "jsonwebtoken";
-import { UnauthorizedError } from "./error";
+import { Request } from "express";
+import { UnauthorizedError } from "./error.js";
 
 const saltRounds = 10;
 
@@ -47,4 +48,18 @@ export function validateJWT(tokenString: string, secret: string) {
     }
 
     return userId;
+}
+
+export function getBearerToken(req: Request) {
+    const auth = req.get("Authorization");
+
+    if (!auth) {
+        throw new Error("Authorization does not exist");
+    }
+
+    if (!auth.startsWith("Bearer ")) {
+        throw new Error("Authorization is not a Bearer token");
+    }
+
+    return auth.slice(7);
 }

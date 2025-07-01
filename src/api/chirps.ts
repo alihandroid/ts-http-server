@@ -2,11 +2,12 @@ import { Request, Response } from "express";
 import { BadRequestError, NotFoundError } from "../error.js";
 import { NewChirp } from "../db/schema.js";
 import { createChirp, getAllChirps, getChirpById } from "../db/queries/chirps.js";
+import { getBearerToken, validateJWT } from "../auth.js";
+import { config } from "../config.js";
 
 export async function handlerPostChirps(req: Request, res: Response) {
     type parameters = {
         body: string;
-        userId: string
     };
 
     let params: parameters = req.body;
@@ -19,12 +20,15 @@ export async function handlerPostChirps(req: Request, res: Response) {
         throw new BadRequestError("Chirp is too long. Max length is 140");
     }
 
+    const token = getBearerToken(req);
+    const userId = validateJWT(token, config.jwtSecret);
+
     const badWords = ["kerfuffle", "sharbert", "fornax"];
     const cleanedBody = params.body.split(" ").map(x => badWords.includes(x.toLowerCase()) ? "****" : x).join(" ");
 
     const newChirp: NewChirp = {
         body: cleanedBody,
-        userId: params.userId
+        userId
     };
 
     const result = await createChirp(newChirp);

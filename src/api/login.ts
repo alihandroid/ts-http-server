@@ -1,11 +1,16 @@
 import { Request, response, Response } from "express";
 import { BadRequestError, UnauthorizedError } from "../error.js";
 import { getUserByEmail } from "../db/queries/users.js";
-import { checkPasswordHash } from "../auth.js";
+import { checkPasswordHash, makeJWT } from "../auth.js";
+import { config } from "../config.js";
 
 export async function handlerLogin(req: Request, res: Response) {
     const email = req.body.email;
     const password = req.body.password;
+    let expiresInSeconds = req.body.expiresInSeconds ?? 1 * 60 * 60; // 1 hour by default
+    if (expiresInSeconds > 1 * 60 * 60) {
+        expiresInSeconds = 1 * 60 * 60; // max 1 hour
+    }
 
     if (!email) {
         throw new BadRequestError("Missing property: email");
@@ -27,5 +32,7 @@ export async function handlerLogin(req: Request, res: Response) {
 
     const { hashedPassword, ...response } = user;
 
-    res.status(200).json(response);
+    const token = makeJWT(user.id, expiresInSeconds, config.jwtSecret);
+
+    res.status(200).json({ ...response, token });
 }

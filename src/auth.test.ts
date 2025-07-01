@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeAll } from "vitest";
-import { checkPasswordHash, hashPassword, makeJWT, validateJWT } from "./auth";
+import { checkPasswordHash, getBearerToken, hashPassword, makeJWT, validateJWT } from "./auth";
+import { Request } from "express";
 
 describe("Password Hashing", () => {
     const password1 = "correctPassword123!";
@@ -30,3 +31,28 @@ describe("JWT", () => {
         expect(result).toBe(userId);
     });
 });
+
+describe("Bearer token", () => {
+    function createRequest(obj: Record<string, string> = {}) {
+        const res = new Map();
+        for (const key in obj) {
+            res.set(key, obj[key]);
+        }
+        return res as unknown as Request;
+    };
+
+    it("should throw an error if there's no Authorization header", () => {
+        const req = createRequest();
+        expect(() => getBearerToken(req)).toThrow();
+    });
+
+    it("should throw an error if Authorization doesn't start with 'Bearer '", () => {
+        const req = createRequest({ "Authorization": "Bearer123123" });
+        expect(() => getBearerToken(req)).toThrow();
+    });
+
+    it("should return the token", () => {
+        const req = createRequest({ "Authorization": "Bearer 123123" });
+        expect(getBearerToken(req)).toEqual("123123");
+    });
+})
