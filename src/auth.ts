@@ -68,3 +68,17 @@ export function getBearerToken(req: Request) {
 export function makeRefreshToken() {
     return crypto.randomBytes(32).toString('hex');
 }
+
+export function getAPIKey(req: Request) {
+    const auth = req.get("Authorization");
+
+    if (!auth) {
+        throw new UnauthorizedError("Authorization does not exist");
+    }
+
+    if (!auth.startsWith("ApiKey ")) {
+        throw new UnauthorizedError("Authorization is not an ApiKey token");
+    }
+
+    return auth.slice(7);
+}
